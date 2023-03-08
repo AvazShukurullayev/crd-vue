@@ -1,14 +1,13 @@
 <template>
   <div class="btn-group">
-    <button
+    <PrimaryButton
       v-for="btn in filterButtons"
       :key="btn.name"
-      class="btn"
       :class="[filter == btn.name ? 'btn-dark' : 'btn-outline-dark']"
       @click="filterHandler(btn.name)"
     >
       {{ btn.title }}
-    </button>
+    </PrimaryButton>
   </div>
 </template>
 
@@ -16,7 +15,6 @@
 export default {
   name: "AppFilter",
   props: {},
-  components: {},
   data() {
     return {
       filterButtons: [
@@ -36,4 +34,4 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style></style>

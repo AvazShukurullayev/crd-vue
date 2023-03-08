@@ -1,37 +1,32 @@
 <template>
-  <li
+  <MyLi
     class="list-group-item d-flex justify-content-between align-items-center"
     :class="{ like: movie.like, favourite: movie.favourite }"
   >
-    <span
+    <MySpan
       class="list-group-item__span"
       @click="$emit('onToggle', { id: movie.id, prop: 'like' })"
     >
       {{ movie.name }}
-    </span>
+    </MySpan>
     <input
       class="list-group-item__input text-center"
       type="number"
       :value="movie.viewers"
     />
     <div class="d-flex justify-content-center align-items-center">
-      <button
-        class="btn-cookie btn-sm"
-        type="button"
+      <SmallButton
+        class="btn-cookie"
         @click="$emit('onToggle', { id: movie.id, prop: 'favourite' })"
       >
         <i class="fas fa-cookie"></i>
-      </button>
-      <button
-        class="btn-trash btn-sm"
-        type="button"
-        @click="$emit('onRemove', movie.id)"
-      >
+      </SmallButton>
+      <SmallButton class="btn-trash" @click="$emit('onRemove', movie.id)">
         <i class="fas fa-trash"></i>
-      </button>
+      </SmallButton>
       <i class="fas fa-star"></i>
     </div>
-  </li>
+  </MyLi>
 </template>
 
 <script>
@@ -43,21 +38,10 @@ export default {
       required: true,
     },
   },
-  components: {},
   data() {
     return {};
   },
-  methods: {
-    /* onLike() {
-      this.$emit("onLike", this.movie.id);
-    }, */
-    /* onFavourite() {
-      this.$emit("onFavourite", this.movie.id);
-    }, */
-    /* onDelete() {
-      this.$emit("onDelete", this.movie.id);
-    }, */
-  },
+  methods: {},
 };
 </script>
 

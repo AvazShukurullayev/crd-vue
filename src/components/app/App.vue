@@ -6,10 +6,10 @@
         :likeMoviesCount="movies.filter((c) => c.like).length"
         :favouriteMoviesCount="movies.filter((c) => c.favourite).length"
       />
-      <div class="search-panel">
+      <Box>
         <SearchPanel @onChangeHandler="onChangeHandler" />
         <AppFilter @onFilter="onFilter" />
-      </div>
+      </Box>
       <MovieList
         :movies="onFilterHandler(onSearchHandler(movies, term), filter)"
         @onToggle="onToggleHandler"
@@ -116,13 +116,6 @@ export default {
 }
 .content {
   padding: 2rem 0;
-}
-.search-panel {
-  margin-top: 2rem;
-  padding: 1.5rem;
-  background-color: #fcfaf5;
-  border-radius: 4px;
-  box-shadow: 15px 15px 15px rgba(0, 0, 0, 0.15);
 }
 </style>
 
