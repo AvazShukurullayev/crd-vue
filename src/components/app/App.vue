@@ -10,11 +10,36 @@
         <SearchPanel @onChangeHandler="onChangeHandler" />
         <AppFilter @onFilter="onFilter" />
       </Box>
+
+      <Box v-if="!movies.length && !isLoading">
+        <Paragraph class="text-center text-danger fs-3">Kinolar yo'q</Paragraph>
+      </Box>
+      <Box v-else-if="isLoading" class="text-center">
+        <MyLoader />
+      </Box>
       <MovieList
+        v-else
         :movies="onFilterHandler(onSearchHandler(movies, term), filter)"
         @onToggle="onToggleHandler"
         @onRemove="onRemoveHandler"
       />
+
+      <Box class="d-flex justify-content-center">
+        <nav aria-label="pagination">
+          <ul class="pagination">
+            <li
+              v-for="pageNumber in totalPages"
+              :key="pageNumber"
+              @click="changePageHandler(pageNumber)"
+              :class="{ active: pageNumber === page }"
+              class="page-item"
+              aria-current="page"
+            >
+              <span class="page-link">{{ pageNumber }}</span>
+            </li>
+          </ul>
+        </nav>
+      </Box>
       <MovieAddForm @createMovie="createMovie" />
     </div>
   </div>
@@ -26,48 +51,36 @@ import SearchPanel from "@/components/search-panel/SearchPanel.vue";
 import AppFilter from "@/components/app-filter/AppFilter.vue";
 import MovieList from "@/components/movie-list/MovieList.vue";
 import MovieAddForm from "@/components/movie-add-form/MovieAddForm.vue";
+
+import axios from "axios";
+
 export default {
   name: "App",
   components: { AppInfo, SearchPanel, AppFilter, MovieList, MovieAddForm },
   data() {
     return {
-      movies: [
-        {
-          name: "Omar",
-          viewers: 811,
-          favourite: false,
-          like: false,
-          id: 1,
-        },
-        {
-          name: "Ertugrul",
-          viewers: 911,
-          favourite: false,
-          like: false,
-          id: 2,
-        },
-        {
-          name: "Empire of Osman",
-          viewers: 1411,
-          favourite: false,
-          like: false,
-          id: 3,
-        },
-        {
-          name: "Otto Fon Bismark",
-          viewers: 477,
-          favourite: false,
-          like: false,
-          id: 4,
-        },
-      ],
+      movies: [],
       term: "",
       filter: "all",
+      isLoading: false,
+      limit: 10,
+      page: 1,
+      totalPages: 0,
     };
   },
   methods: {
-    createMovie(item) {
-      this.movies.push(item);
+    async createMovie(item) {
+      try {
+        const response = await axios.post(
+          "https://jsonplaceholder.typicode.com/posts",
+          item
+        );
+        console.log(response.data);
+        this.movies.push(response.data)
+      } catch (error) {
+        alert(error.message);
+      }
+      // this.movies.push(item);
     },
     onToggleHandler({ id, prop }) {
       this.movies = this.movies.map((item) => {
@@ -78,8 +91,16 @@ export default {
       });
     },
 
-    onRemoveHandler(id) {
-      this.movies = this.movies.filter((c) => c.id !== id);
+    async onRemoveHandler(id) {
+      try {
+        const response = await axios.delete(
+          `https://jsonplaceholder.typicode.com/posts/${id}`
+        );
+        console.log("response delete => ", response);
+        this.movies = this.movies.filter((c) => c.id !== id);
+      } catch (error) {
+        alert(error.message);
+      }
     },
     onSearchHandler(arr, term) {
       if (term.length == 0) {
@@ -105,6 +126,48 @@ export default {
     },
     onFilter(filter) {
       this.filter = filter;
+    },
+    async getApi() {
+      try {
+        this.isLoading = true;
+        const response = await axios.get(
+          "https://jsonplaceholder.typicode.com/posts",
+          {
+            params: {
+              _limit: this.limit,
+              _page: this.page,
+            },
+          }
+        );
+        const newArr = response.data.map((item) => ({
+          name: item.title,
+          viewers: item.id * 100,
+          id: item.id,
+          like: false,
+          favourite: false,
+        }));
+        this.totalPages = Math.ceil(
+          response.headers["x-total-count"] / this.limit
+        );
+        this.movies = newArr;
+        console.log(response.data);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        this.isLoading = false;
+      }
+    },
+    changePageHandler(page) {
+      this.page = page;
+      // this.getApi();
+    },
+  },
+  mounted() {
+    this.getApi();
+  },
+  watch: {
+    page() {
+      this.getApi();
     },
   },
 };
@@ -135,3 +198,24 @@ export default {
         return item;
       });
     }, */ -->
+
+<!-- 
+
+      setTimeout(async () => {
+          const response = await axios.get(
+            "https://jsonplaceholder.typicode.com/posts?_limit=10"
+          );
+          const newArr = response.data.map((item) => ({
+            name: item.title,
+            viewers: item.id * 100,
+            id: item.id,
+            like: false,
+            favourite: false,
+          }));
+          this.movies = newArr;
+          this.isLoading = false;
+          console.log(response.data);
+        }, 3000);
+
+
+     -->
